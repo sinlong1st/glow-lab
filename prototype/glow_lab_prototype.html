@@ -1,0 +1,528 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Glow Lab — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== Design tokens (palette: rose / mauve / champagne, vanity-table luxe) ===== */
+  :root{
+    --bg:#FBF4F1;
+    --card:#FFFDFC;
+    --mauve:#C98B9B;
+    --mauve-deep:#A8607A;
+    --plum:#4A2E3A;
+    --plum-soft:#7A5866;
+    --gold:#C9A24B;
+    --gold-soft:#E8CFA0;
+    --line:#EBD9D6;
+    --shadow:0 14px 40px -18px rgba(74,46,58,.45);
+    --shadow-sm:0 6px 18px -10px rgba(74,46,58,.4);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:"Jost",system-ui,sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #FCE9E4 0%, transparent 55%),
+      var(--bg);
+    color:var(--plum);
+    display:flex;justify-content:center;align-items:flex-start;
+    min-height:100%;padding:14px;
+  }
+  .app{
+    width:100%;max-width:430px;min-height:760px;
+    background:var(--card);
+    border-radius:30px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    overflow:hidden;position:relative;
+    display:flex;flex-direction:column;
+  }
+  .display{font-family:"Bodoni Moda",Georgia,serif}
+
+  /* ===== Top bar ===== */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px 10px;
+  }
+  .brand{display:flex;align-items:center;gap:8px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #fff, var(--mauve));
+    box-shadow:0 0 0 4px rgba(201,139,155,.18)}
+  .brand b{font-family:"Bodoni Moda",serif;font-weight:600;letter-spacing:.5px;font-size:18px}
+  .coins{
+    display:flex;align-items:center;gap:6px;
+    background:linear-gradient(135deg,#FFF6E6,#FBEAD2);
+    border:1px solid var(--gold-soft);
+    color:#8A6A1E;font-weight:600;font-size:14px;
+    padding:6px 12px;border-radius:999px;
+  }
+  .coins .c{width:16px;height:16px;border-radius:50%;
+    background:radial-gradient(circle at 32% 30%, #FBE6A8, var(--gold));
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
+
+  /* ===== Screens ===== */
+  .screen{flex:1;display:none;flex-direction:column;animation:fade .35s ease}
+  .screen.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ----- Home ----- */
+  #home{justify-content:center;align-items:center;text-align:center;padding:24px 28px 40px;gap:6px}
+  .vanity{
+    width:170px;height:170px;margin-bottom:6px;position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .vanity .mirror{
+    width:150px;height:150px;border-radius:50% 50% 48% 48%;
+    background:radial-gradient(120% 120% at 50% 20%,#fff 0%,#FBEFEC 60%,#F3DDDA 100%);
+    border:6px solid #fff;
+    box-shadow:0 0 0 2px var(--mauve), var(--shadow);
+    position:relative;
+  }
+  .vanity .bulb{position:absolute;width:11px;height:11px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#FBE6A8);box-shadow:0 0 8px #F7D98A}
+  .home-kicker{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--mauve-deep);font-weight:500}
+  #home h1{font-family:"Bodoni Moda",serif;font-weight:600;font-size:46px;margin:2px 0 4px;line-height:1}
+  #home p{color:var(--plum-soft);font-size:15px;max-width:280px;margin:0 0 22px;line-height:1.5}
+  .btn{
+    border:none;cursor:pointer;font-family:"Jost",sans-serif;font-weight:600;
+    border-radius:999px;font-size:16px;padding:15px 30px;
+    background:linear-gradient(135deg,var(--mauve),var(--mauve-deep));
+    color:#fff;box-shadow:var(--shadow-sm);transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{transform:translateY(1px) scale(.99)}
+  .btn.ghost{background:#fff;color:var(--plum);border:1px solid var(--line);box-shadow:none}
+  .home-foot{margin-top:18px;font-size:12.5px;color:var(--plum-soft)}
+
+  /* ----- Game ----- */
+  #game{padding:4px 18px 16px;gap:12px}
+  .request{
+    background:linear-gradient(135deg,#fff,#FDF3F0);
+    border:1px solid var(--line);border-radius:18px;
+    padding:13px 16px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow-sm)}
+  .request .who{flex:1}
+  .request .who .name{font-weight:600;font-size:13px;color:var(--mauve-deep);display:flex;gap:8px;align-items:center}
+  .request .who .name .tags{font-weight:500;color:var(--plum-soft);font-size:11px;letter-spacing:.3px}
+  .request .who .say{font-family:"Bodoni Moda",serif;font-style:italic;font-size:16px;margin-top:2px;line-height:1.25}
+  .timer{font-weight:600;font-size:13px;color:var(--plum-soft);min-width:42px;text-align:right}
+  .timer b{font-family:"Bodoni Moda",serif;font-size:20px;color:var(--plum)}
+
+  /* face preview */
+  .stage{display:flex;justify-content:center;align-items:center;padding:2px 0}
+  .face-wrap{width:182px;height:200px;position:relative;
+    filter:drop-shadow(0 12px 24px rgba(74,46,58,.22))}
+  svg .glow-layer{opacity:0;transition:opacity .4s ease}
+  .face-wrap.has-glow svg .glow-layer{opacity:1}
+
+  /* product picker */
+  .picker{display:flex;flex-direction:column;gap:9px;margin-top:2px}
+  .cat{}
+  .cat .head{display:flex;justify-content:space-between;align-items:center;margin:0 2px 5px}
+  .cat .head .label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mauve-deep);font-weight:600}
+  .cat .head .chosen{font-size:12px;color:var(--plum-soft);font-weight:500}
+  .row{display:flex;gap:9px;overflow-x:auto;padding:3px 2px 6px;scrollbar-width:none}
+  .row::-webkit-scrollbar{display:none}
+  .sw{
+    flex:0 0 auto;width:48px;height:48px;border-radius:14px;cursor:pointer;position:relative;
+    border:2px solid #fff;box-shadow:0 0 0 1px var(--line), var(--shadow-sm);
+    transition:transform .12s ease, box-shadow .12s ease;
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .sw:active{transform:scale(.94)}
+  .sw.sel{box-shadow:0 0 0 2px var(--mauve-deep), 0 6px 14px -6px rgba(168,96,122,.6);transform:translateY(-2px)}
+  .sw .code{font-size:9px;font-weight:600;color:rgba(74,46,58,.7);background:rgba(255,255,255,.78);
+    border-radius:0 0 11px 11px;width:100%;text-align:center;padding:1px 0;line-height:1.3}
+  .sw.locked{cursor:pointer;filter:saturate(.5)}
+  .sw.locked::after{content:"";position:absolute;inset:0;border-radius:12px;background:rgba(255,255,255,.55)}
+  .sw .lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:2;font-size:9px;font-weight:600;color:var(--plum);gap:1px}
+  .sw .lock svg{width:13px;height:13px}
+
+  .actionbar{display:flex;gap:10px;margin-top:4px}
+  .actionbar .btn{flex:1;padding:14px}
+
+  /* ----- Result ----- */
+  #result{padding:24px 26px;justify-content:center;text-align:center;gap:4px}
+  .stars{font-size:34px;letter-spacing:6px;color:var(--gold);height:42px}
+  .stars .off{color:var(--line)}
+  #result h2{font-family:"Bodoni Moda",serif;font-weight:600;font-size:30px;margin:6px 0 2px}
+  #result .sub{color:var(--plum-soft);font-size:14px;margin-bottom:16px}
+  .score-card{background:#FDF6F4;border:1px solid var(--line);border-radius:18px;padding:14px 16px;text-align:left}
+  .score-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .score-row:last-child{border-bottom:none}
+  .score-row .v{font-weight:600;font-family:"Bodoni Moda",serif}
+  .score-row .v.pos{color:#3E8E6E}
+  .score-row .v.neg{color:#C25B5B}
+  .score-row.total{margin-top:4px;font-size:16px}
+  .score-row.total .lab{font-weight:600}
+  .reward{margin:16px 0 18px;font-size:15px;color:var(--plum-soft)}
+  .reward b{font-family:"Bodoni Moda",serif;font-size:22px;color:#8A6A1E}
+
+  .hint{font-size:12px;color:var(--plum-soft);text-align:center;margin-top:8px;line-height:1.5}
+  .toast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--plum);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:500;
+    opacity:0;pointer-events:none;transition:.3s ease;z-index:30}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span><b class="display">Glow Lab</b></div>
+    <div class="coins"><span class="c"></span><span id="coinCount">0</span></div>
+  </div>
+
+  <!-- HOME -->
+  <section class="screen active" id="home">
+    <div class="vanity"><div class="mirror" id="mirrorBulbs"></div></div>
+    <div class="home-kicker">your beauty studio</div>
+    <h1 class="display">Glow Lab</h1>
+    <p>Khách bước vào với một vibe muốn có. Chọn đúng foundation, blush, lip và glow để chốt look.</p>
+    <button class="btn" onclick="startGame()">Open Studio</button>
+    <div class="home-foot">5 khách hôm nay · mở khoá sản phẩm mới bằng coins</div>
+  </section>
+
+  <!-- GAME -->
+  <section class="screen" id="game">
+    <div class="request">
+      <div class="who">
+        <div class="name"><span id="custName">Mai</span><span class="tags" id="custTags">fair · neutral</span></div>
+        <div class="say display" id="custSay">"..."</div>
+      </div>
+      <div class="timer">⏱<br><b id="timeLeft">30</b></div>
+    </div>
+
+    <div class="stage">
+      <div class="face-wrap" id="faceWrap">
+        <svg viewBox="0 0 182 200" id="faceSvg" xmlns="http://www.w3.org/2000/svg">
+          <!-- hair backdrop -->
+          <path d="M91 8 C45 8 33 48 33 92 C33 150 55 196 91 196 C127 196 149 150 149 92 C149 48 137 8 91 8 Z" fill="#6A4A3C" opacity=".9"/>
+          <!-- face -->
+          <ellipse id="faceShape" cx="91" cy="100" rx="52" ry="64" fill="#F3D9C9"/>
+          <!-- neck -->
+          <rect x="76" y="150" width="30" height="34" rx="12" id="neck" fill="#F3D9C9"/>
+          <!-- glow / highlight layer -->
+          <g class="glow-layer">
+            <ellipse id="glowL" cx="68" cy="92" rx="11" ry="7" fill="#fff" opacity=".0"/>
+            <ellipse id="glowR" cx="114" cy="92" rx="11" ry="7" fill="#fff" opacity=".0"/>
+            <ellipse id="glowNose" cx="91" cy="104" rx="4" ry="14" fill="#fff" opacity=".0"/>
+          </g>
+          <!-- blush -->
+          <ellipse id="blushL" cx="66" cy="112" rx="13" ry="9" fill="#E8A0B4" opacity="0"/>
+          <ellipse id="blushR" cx="116" cy="112" rx="13" ry="9" fill="#E8A0B4" opacity="0"/>
+          <!-- eyes -->
+          <ellipse cx="71" cy="92" rx="6.5" ry="7.5" fill="#fff"/>
+          <ellipse cx="111" cy="92" rx="6.5" ry="7.5" fill="#fff"/>
+          <circle cx="72" cy="93" r="3.6" fill="#5A3A2E"/>
+          <circle cx="112" cy="93" r="3.6" fill="#5A3A2E"/>
+          <path d="M63 84 Q71 80 79 84" stroke="#6A4A3C" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M103 84 Q111 80 119 84" stroke="#6A4A3C" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <!-- nose -->
+          <path d="M89 100 Q88 114 84 120 Q90 124 96 120" stroke="#D9B49E" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- lips -->
+          <g id="lipGroup">
+            <path id="lipShape" d="M76 136 Q91 130 106 136 Q98 146 91 146 Q84 146 76 136 Z" fill="#C56B70"/>
+            <path id="lipShine" d="M84 137 Q91 134 98 137 Q92 139 84 137 Z" fill="#fff" opacity="0"/>
+          </g>
+          <!-- hair front -->
+          <path d="M91 8 C50 8 39 44 38 78 C46 64 60 56 74 56 C70 40 80 30 91 30 C102 30 112 40 108 56 C122 56 136 64 144 78 C143 44 132 8 91 8 Z" fill="#7A5443"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="picker" id="picker"><!-- categories injected --></div>
+
+    <div class="actionbar">
+      <button class="btn" id="revealBtn" onclick="revealLook()">Reveal look</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="result">
+    <div class="stars" id="stars">★★★</div>
+    <h2 class="display" id="resultTitle">Gorgeous!</h2>
+    <div class="sub" id="resultSub">Khách rất ưng look này</div>
+    <div class="score-card" id="scoreCard"></div>
+    <div class="reward">+ <b id="coinsEarned">0</b> coins</div>
+    <button class="btn" id="nextBtn" onclick="nextCustomer()">Khách tiếp theo</button>
+    <div class="hint" id="resultHint"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* =========================================================================
+   GLOW LAB — prototype logic
+   Tách rõ DATA + SCORING khỏi UI để port sang Unity/C# dễ dàng.
+   Không dùng localStorage (state giữ trong RAM, reset khi reload).
+   ========================================================================= */
+
+/* ---- skin tone -> màu nền mặt + thứ tự độ đậm (để tính lệch tone) ---- */
+const TONE_ORDER = ["fair","light","medium","tan"];
+const TONE_COLOR = { fair:"#F3D9C9", light:"#EAC4A6", medium:"#D6A37C", tan:"#BE855C" };
+
+/* ---- nhiệt độ màu cho color harmony ---- */
+const TEMP = {
+  blush:{ pink:"cool", berry:"cool", coral:"warm", peach:"warm", mauve:"cool" },
+  lip:{ oil:"warm", balm:"neutral", gloss:"cool", matte:"cool" },
+  glow:{ pearl:"cool", champagne:"warm", rose:"cool", bronze:"warm", holo:"cool" }
+};
+
+/* ---- PRODUCTS (17 base + 3 locked) ---- */
+const PRODUCTS = {
+  foundation:[
+    {key:"00", name:"00 Porcelain", tone:"fair",   undertone:"cool",    swatch:"#F4DDCF"},
+    {key:"0N", name:"0N Ivory",     tone:"fair",   undertone:"neutral", swatch:"#EFD2BE"},
+    {key:"1N", name:"1N Beige",     tone:"light",  undertone:"neutral", swatch:"#E6C2A4"},
+    {key:"2N", name:"2N Sand",      tone:"medium", undertone:"neutral", swatch:"#D5A47D"},
+    {key:"3W", name:"3W Honey",     tone:"tan",    undertone:"warm",    swatch:"#C68A5C"},
+    {key:"1W", name:"1W Amber",     tone:"light",  undertone:"warm",    swatch:"#E3B488", locked:true, price:30},
+  ],
+  blush:[
+    {key:"pink",  name:"Pink",  swatch:"#E8A0B4"},
+    {key:"berry", name:"Berry", swatch:"#B2506F"},
+    {key:"coral", name:"Coral", swatch:"#F0876B"},
+    {key:"peach", name:"Peach", swatch:"#F2B79C"},
+    {key:"mauve", name:"Mauve", swatch:"#C58AA0", locked:true, price:40},
+  ],
+  lip:[
+    {key:"oil",   name:"Oil",   swatch:"#E59A8C"},
+    {key:"balm",  name:"Balm",  swatch:"#D98B8B"},
+    {key:"gloss", name:"Gloss", swatch:"#C95C7A"},
+    {key:"matte", name:"Matte", swatch:"#A84A5E"},
+  ],
+  glow:[
+    {key:"pearl",     name:"Pearl",     swatch:"#F5EFE6"},
+    {key:"champagne", name:"Champagne", swatch:"#E8CFA0"},
+    {key:"rose",      name:"Rose",      swatch:"#EBC2C0"},
+    {key:"bronze",    name:"Bronze",    swatch:"#C98A52"},
+    {key:"holo",      name:"Holo",      swatch:"#D9C7E8", locked:true, price:50, harmonyKey:"holographic"},
+  ],
+};
+
+/* ---- CUSTOMERS (5 mẫu) ---- */
+const CUSTOMERS = [
+  {name:"Mai",   request:"Clean girl look for brunch ☕", skinTone:"fair",   undertone:"neutral",
+   occasion:"brunch",     preferredBlush:"peach", preferredLip:"balm",  preferredGlow:"pearl"},
+  {name:"Linh",  request:"Date night, make it glam ✨",   skinTone:"fair",   undertone:"cool",
+   occasion:"date night", preferredBlush:"berry", preferredLip:"gloss", preferredGlow:"pearl"},
+  {name:"Hà",    request:"Sunny beach day, sun-kissed 🏖️", skinTone:"tan",   undertone:"warm",
+   occasion:"beach",      preferredBlush:"coral", preferredLip:"oil",   preferredGlow:"bronze"},
+  {name:"Trang", request:"Office meeting, polished & calm", skinTone:"medium", undertone:"neutral",
+   occasion:"office",     preferredBlush:"pink",  preferredLip:"matte", preferredGlow:"champagne"},
+  {name:"Vy",    request:"Wedding guest, soft glam 💐",   skinTone:"light",  undertone:"warm",
+   occasion:"wedding",    preferredBlush:"pink",  preferredLip:"gloss", preferredGlow:"rose"},
+];
+
+/* ====================== STATE ====================== */
+let coins = 0;
+let idx = 0;
+let sel = { foundation:null, blush:null, lip:null, glow:null };
+let unlocked = new Set();   // keys đã mở khoá
+let timeLeft = 30, timer = null;
+
+/* ====================== SCORING (thuần logic) ====================== */
+function findProduct(cat, key){ return PRODUCTS[cat].find(p=>p.key===key); }
+
+function scoreFoundation(c){
+  const p = findProduct("foundation", sel.foundation);
+  let pts = 0, detail = "";
+  const dist = Math.abs(TONE_ORDER.indexOf(p.tone) - TONE_ORDER.indexOf(c.skinTone));
+  if(dist===0){ pts += 30; detail="tone khớp"; }
+  else if(dist===1){ pts += 10; detail="lệch 1 bậc"; }
+  else { pts += -20; detail="lệch tone nặng"; }
+  if(p.undertone === c.undertone){ pts += 10; detail += ", undertone đúng"; }
+  else { detail += ", sai undertone"; }
+  return {label:"Foundation", pts, detail};
+}
+function scorePref(cat, c, prefKey){
+  const chosen = sel[cat];
+  let pts, detail;
+  if(chosen === prefKey){ pts = 20; detail = "đúng ý khách"; }
+  else if(TEMP[cat][chosen] !== "neutral" && TEMP[cat][chosen] === TEMP[cat][prefKey]){ pts = 8; detail = "cùng tông nhiệt"; }
+  else { pts = 3; detail = "chưa hợp lắm"; }
+  return {label:cat.charAt(0).toUpperCase()+cat.slice(1), pts, detail};
+}
+function scoreHarmony(){
+  const temps = [TEMP.blush[sel.blush], TEMP.lip[sel.lip], TEMP.glow[sel.glow]]
+                .filter(t=>t!=="neutral");
+  const allSame = temps.every(t=>t===temps[0]);
+  return {label:"Color harmony", pts: allSame?10:0, detail: allSame?"đồng bộ tông":"hơi lệch tông"};
+}
+function calcScore(c){
+  const rows = [
+    scoreFoundation(c),
+    scorePref("blush", c, c.preferredBlush),
+    scorePref("lip", c, c.preferredLip),
+    scorePref("glow", c, c.preferredGlow),
+    scoreHarmony(),
+    {label:"Time bonus", pts: Math.round((timeLeft/30)*15), detail:`${timeLeft}s còn lại`},
+  ];
+  const total = rows.reduce((s,r)=>s+r.pts,0);
+  return {rows, total};
+}
+
+/* ====================== UI ====================== */
+const $ = id => document.getElementById(id);
+function show(screen){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $(screen).classList.add("active");
+}
+function toast(msg){
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("show"), 1600);
+}
+function updateCoins(){ $("coinCount").textContent = coins; }
+
+/* vẽ bóng đèn quanh gương ở Home */
+(function buildBulbs(){
+  const m = $("mirrorBulbs"); const n=14;
+  for(let i=0;i<n;i++){
+    const a = (i/n)*Math.PI*2;
+    const b = document.createElement("div");
+    b.className="bulb";
+    b.style.left = (75 + Math.cos(a)*78 - 5.5) + "px";
+    b.style.top  = (75 + Math.sin(a)*78 - 5.5) + "px";
+    m.appendChild(b);
+  }
+})();
+
+function startGame(){ idx = 0; loadCustomer(); show("game"); }
+
+function loadCustomer(){
+  const c = CUSTOMERS[idx];
+  sel = { foundation:null, blush:null, lip:null, glow:null };
+  $("custName").textContent = c.name;
+  $("custTags").textContent = `${c.skinTone} · ${c.undertone} · ${c.occasion}`;
+  $("custSay").textContent = `"${c.request}"`;
+  // mặt theo skin tone của khách
+  const toneCol = TONE_COLOR[c.skinTone];
+  $("faceShape").setAttribute("fill", toneCol);
+  $("neck").setAttribute("fill", toneCol);
+  // reset makeup preview
+  $("blushL").setAttribute("opacity","0");
+  $("blushR").setAttribute("opacity","0");
+  $("faceWrap").classList.remove("has-glow");
+  setLip("balm", false, true);          // mặt mộc: môi nhạt mặc định
+  $("lipShape").setAttribute("fill", "#C97D7E");
+  $("lipShine").setAttribute("opacity","0");
+  buildPicker();
+  startTimer();
+}
+
+function buildPicker(){
+  const wrap = $("picker"); wrap.innerHTML="";
+  const cats = [["foundation","Foundation"],["blush","Blush"],["lip","Lip"],["glow","Glow"]];
+  cats.forEach(([cat,label])=>{
+    const box = document.createElement("div"); box.className="cat";
+    box.innerHTML = `<div class="head"><span class="label">${label}</span><span class="chosen" id="chosen_${cat}">chọn 1</span></div>`;
+    const row = document.createElement("div"); row.className="row";
+    PRODUCTS[cat].forEach(p=>{
+      const isLocked = p.locked && !unlocked.has(p.key);
+      const sw = document.createElement("div");
+      sw.className = "sw" + (isLocked?" locked":"");
+      sw.style.background = p.swatch;
+      sw.innerHTML = isLocked
+        ? `<span class="lock"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="#4A2E3A" stroke-width="2"/><path d="M8 11V8a4 4 0 018 0v3" stroke="#4A2E3A" stroke-width="2"/></svg>${p.price}</span>`
+        : `<span class="code">${p.name.split(" ")[0]}</span>`;
+      sw.onclick = ()=> isLocked ? tryUnlock(cat,p) : pick(cat,p,sw);
+      row.appendChild(sw);
+    });
+    box.appendChild(row); wrap.appendChild(box);
+  });
+}
+
+function pick(cat, p, swEl){
+  sel[cat] = p.key;
+  // highlight selection
+  swEl.parentElement.querySelectorAll(".sw").forEach(s=>s.classList.remove("sel"));
+  swEl.classList.add("sel");
+  $("chosen_"+cat).textContent = p.name;
+  applyPreview(cat, p);
+}
+
+/* cập nhật makeup lên mặt real-time */
+function applyPreview(cat, p){
+  if(cat==="blush"){
+    $("blushL").setAttribute("fill", p.swatch); $("blushR").setAttribute("fill", p.swatch);
+    $("blushL").setAttribute("opacity",".55"); $("blushR").setAttribute("opacity",".55");
+  }
+  if(cat==="lip"){ setLip(p.key, true); $("lipShape").setAttribute("fill", p.swatch); }
+  if(cat==="glow"){
+    $("faceWrap").classList.add("has-glow");
+    const op = p.key==="bronze" ? ".5" : ".75";
+    ["glowL","glowR","glowNose"].forEach(g=>{ $(g).setAttribute("fill", p.swatch); $(g).setAttribute("opacity", op); });
+  }
+}
+function setLip(finish, withShine){
+  // finish ảnh hưởng độ bóng: gloss/oil bóng, matte/balm lì
+  const shiny = (finish==="gloss"||finish==="oil");
+  $("lipShine").setAttribute("opacity", (withShine && shiny) ? ".8" : "0");
+}
+
+function tryUnlock(cat, p){
+  if(coins < p.price){ toast(`Cần ${p.price} coins để mở khoá`); return; }
+  coins -= p.price; unlocked.add(p.key); updateCoins();
+  toast(`Đã mở khoá ${p.name} 🎉`);
+  buildPicker();
+}
+
+/* timer */
+function startTimer(){
+  timeLeft = 30; $("timeLeft").textContent = timeLeft;
+  clearInterval(timer);
+  timer = setInterval(()=>{
+    timeLeft--; $("timeLeft").textContent = Math.max(0,timeLeft);
+    if(timeLeft<=0){ clearInterval(timer); }
+  },1000);
+}
+
+function revealLook(){
+  // bắt buộc chọn đủ 4 món
+  for(const k of ["foundation","blush","lip","glow"]){
+    if(!sel[k]){ toast("Chọn đủ 4 món trước nha"); return; }
+  }
+  clearInterval(timer);
+  const c = CUSTOMERS[idx];
+  const {rows, total} = calcScore(c);
+  const earned = Math.max(0, Math.round(total/4));
+  coins += earned; updateCoins();
+  renderResult(rows, total, earned);
+  show("result");
+}
+
+function renderResult(rows, total, earned){
+  // sao
+  let stars = total>=95?3 : total>=65?2 : total>=35?1 : 0;
+  $("stars").innerHTML = [0,1,2].map(i=> i<stars?"★":"<span class='off'>★</span>").join("");
+  const titles = ["Thử lại nhé","Ổn áp","Đẹp đấy!","Gorgeous!"];
+  const subs = ["Khách chưa ưng lắm","Khách thấy cũng được","Khách khá hài lòng","Khách mê look này"];
+  $("resultTitle").textContent = titles[stars];
+  $("resultSub").textContent = subs[stars];
+  // breakdown
+  $("scoreCard").innerHTML = rows.map(r=>{
+    const cls = r.pts>0?"pos":(r.pts<0?"neg":"");
+    const sign = r.pts>0?"+":"";
+    return `<div class="score-row"><span>${r.label} <span style="color:var(--plum-soft);font-size:12px">· ${r.detail}</span></span><span class="v ${cls}">${sign}${r.pts}</span></div>`;
+  }).join("") + `<div class="score-row total"><span class="lab">Tổng điểm</span><span class="v">${total}</span></div>`;
+  $("coinsEarned").textContent = earned;
+  // gợi ý
+  const lockedLeft = Object.values(PRODUCTS).flat().filter(p=>p.locked && !unlocked.has(p.key)).length;
+  $("resultHint").textContent = lockedLeft>0
+    ? `Còn ${lockedLeft} sản phẩm khoá. Tích coins rồi vào màn chọn để mở khoá.`
+    : `Đã mở khoá hết sản phẩm. Xịn!`;
+}
+
+function nextCustomer(){
+  idx++;
+  if(idx >= CUSTOMERS.length){
+    // hết khách -> quay về home, vòng lại
+    idx = 0;
+    show("home");
+    toast(`Hết khách hôm nay · ${coins} coins`);
+    return;
+  }
+  loadCustomer(); show("game");
+}
+</script>
